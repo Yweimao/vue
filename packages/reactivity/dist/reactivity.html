@@ -16,11 +16,12 @@
       import { reactive } from "./reactivity.js";
 
       //1） 创建一个响应式对象
-      const state = reactive({
+      const state1 = reactive({
         name: "ywm",
         age: 18,
       });
-      console.log(state);
+      const state2 = reactive(state1);
+      console.log(state1 == state2);
       // //2） 副作用函数，数据变化后会重新执行此函数
       // effect(() => {
       //   app.innerHTML = state.name + state.age;
