@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      // import {
+      //   reactive,
+      //   effect,
+      // } from "../../../node_modules/@vue/reactivity/dist/reactivity.esm-browser.js";
+      import { reactive } from "./reactivity.js";
+
+      //1） 创建一个响应式对象
+      const state = reactive({
+        name: "ywm",
+        age: 18,
+      });
+      console.log(state);
+      // //2） 副作用函数，数据变化后会重新执行此函数
+      // effect(() => {
+      //   app.innerHTML = state.name + state.age;
+      // });
+
+      // setTimeout(() => {
+      //   state.name = "ywm2";
+      // }, 1000);
+      // //3) 属性会收集effect (数据依赖收集) 数据会记录自己在那个effect中使用了，数据变化了会找到对应的effect来更新
+    </script>
+  </body>
+</html>
