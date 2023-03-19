@@ -5,12 +5,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node scripts/dev.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "vue": "^3.2.47"
+  },
+  "devDependencies": {
+    "esbuild": "^0.15.17"
   }
 }
