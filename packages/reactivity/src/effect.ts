@@ -1,4 +1,12 @@
 export let activeEffect = undefined;
+
+function cleanupEffect(effect) {
+  const { deps } = effect;
+  for (let i = 0; i < deps.length; i++) {
+    deps[i].delete(effect);
+  }
+  effect.deps.length = 0;
+}
 export class ReactiveEffect {
   // 默认会将fn挂载到类的实例上面
   // 等价于 private fn; this.fn = fn;
@@ -22,7 +30,10 @@ export class ReactiveEffect {
        */
       this.parent = activeEffect;
       activeEffect = this;
-      return this.fn();
+
+      cleanupEffect(this);
+
+      return this.fn(); // fn() 会进行依赖收集
     } finally {
       // 副作用函数执行完清空当前activeEffect
       activeEffect = this.parent;
@@ -73,8 +84,10 @@ export function trigger(target, key, newValue, oldValue) {
   if (!depsMap) return;
   const dep = depsMap.get(key);
 
-  dep &&
-    dep.forEach((effect) => {
+  const effects = [...dep];
+
+  effects &&
+    effects.forEach((effect) => {
       if (effect !== activeEffect) {
         effect.run();
       }
