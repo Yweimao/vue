@@ -3,6 +3,7 @@ export let activeEffect = undefined;
 function cleanupEffect(effect) {
   const { deps } = effect;
   for (let i = 0; i < deps.length; i++) {
+    // 找到set，让set移除自己
     deps[i].delete(effect);
   }
   effect.deps.length = 0;
@@ -10,11 +11,15 @@ function cleanupEffect(effect) {
 export class ReactiveEffect {
   // 默认会将fn挂载到类的实例上面
   // 等价于 private fn; this.fn = fn;
-  constructor(private fn) {}
+  constructor(private fn, public scheduler) {}
   parent = undefined;
   deps = [];
+  active = true;
   run() {
     try {
+      if (!this.active) {
+        return this.fn();
+      }
       /**
        * 解决嵌套effect
        * effect(() => {
@@ -30,7 +35,7 @@ export class ReactiveEffect {
        */
       this.parent = activeEffect;
       activeEffect = this;
-
+      // 清理了上一次的依赖收集
       cleanupEffect(this);
 
       return this.fn(); // fn() 会进行依赖收集
@@ -40,11 +45,23 @@ export class ReactiveEffect {
       this.parent = undefined;
     }
   }
+  stop() {
+    if (this.active) {
+      this.active = false;
+      cleanupEffect(this);
+    }
+  }
 }
 
-export function effect(fn) {
-  const _effect = new ReactiveEffect(fn);
+export function effect(fn, options: any = {}) {
+  const _effect = new ReactiveEffect(fn, options.scheduler);
   _effect.run();
+  //把runner函数返回出去，让用户可以调用effect中自定义的内容
+  const runner = _effect.run.bind(_effect);
+  // 可以通过runner拿到effect实例
+  runner.effect = _effect;
+
+  return runner;
 }
 
 // weakmap : map : set
@@ -89,7 +106,12 @@ export function trigger(target, key, newValue, oldValue) {
   effects &&
     effects.forEach((effect) => {
       if (effect !== activeEffect) {
-        effect.run();
+        // 用户自己手动调度执行
+        if (effect.scheduler) {
+          effect.scheduler();
+        } else {
+          effect.run();
+        }
       }
     });
 }

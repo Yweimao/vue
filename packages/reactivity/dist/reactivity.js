@@ -13,13 +13,18 @@ function cleanupEffect(effect2) {
   effect2.deps.length = 0;
 }
 var ReactiveEffect = class {
-  constructor(fn) {
+  constructor(fn, scheduler) {
     this.fn = fn;
+    this.scheduler = scheduler;
     this.parent = void 0;
     this.deps = [];
+    this.active = true;
   }
   run() {
     try {
+      if (!this.active) {
+        return this.fn();
+      }
       this.parent = activeEffect;
       activeEffect = this;
       cleanupEffect(this);
@@ -29,10 +34,19 @@ var ReactiveEffect = class {
       this.parent = void 0;
     }
   }
+  stop() {
+    if (this.active) {
+      this.active = false;
+      cleanupEffect(this);
+    }
+  }
 };
-function effect(fn) {
-  const _effect = new ReactiveEffect(fn);
+function effect(fn, options = {}) {
+  const _effect = new ReactiveEffect(fn, options.scheduler);
   _effect.run();
+  const runner = _effect.run.bind(_effect);
+  runner.effect = _effect;
+  return runner;
 }
 var targetMap = /* @__PURE__ */ new WeakMap();
 function track(target, key) {
@@ -60,7 +74,11 @@ function trigger(target, key, newValue, oldValue) {
   const effects = [...dep];
   effects && effects.forEach((effect2) => {
     if (effect2 !== activeEffect) {
-      effect2.run();
+      if (effect2.scheduler) {
+        effect2.scheduler();
+      } else {
+        effect2.run();
+      }
     }
   });
 }
@@ -70,6 +88,9 @@ var mutableHandlers = {
   get(target, key, receiver) {
     if (key == "__v_isReactive" /* IS_REACTIVE */)
       return true;
+    if (isObject(target[key])) {
+      return reactive(target[key]);
+    }
     const res = Reflect.get(target, key, receiver);
     track(target, key);
     return res;
