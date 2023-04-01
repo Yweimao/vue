@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      //   import {
+      //     reactive,
+      //     effect,
+      //     watch,
+      //   } from "../../../node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js";
+
+      import { reactive, effect, watch } from "./reactivity.js";
+
+      const state = reactive({
+        name: "ywm",
+        age: 18,
+        flag: true,
+      });
+      // 对象是无法监控到前后值的更改， 对象是值的引用
+      watch(state, (newValue, oldValue) => {
+        console.log("watch", newValue, oldValue);
+      });
+      state.name = "ywm2";
+    </script>
+  </body>
+</html>

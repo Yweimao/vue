@@ -2,6 +2,9 @@
 var isObject = (val) => {
   return val !== null && typeof val === "object";
 };
+var isFunction = (val) => {
+  return typeof val === "function";
+};
 
 // packages/reactivity/src/effect.ts
 var activeEffect = void 0;
@@ -115,21 +118,55 @@ function reactive(target) {
   if (!isObject(target))
     return target;
   const exitingProxy = reaceiveMap.get(target);
-  if (target["__v_isReactive" /* IS_REACTIVE */])
+  if (target["__v_isReactive" /* IS_REACTIVE */]) {
     return target;
+  }
   if (exitingProxy)
     return exitingProxy;
   const proxy = new Proxy(target, mutableHandlers);
   reaceiveMap.set(target, proxy);
   return proxy;
 }
+function isReactive(val) {
+  return val["__v_isReactive" /* IS_REACTIVE */];
+}
+
+// packages/reactivity/src/apiWatch.ts
+function traverse(val, seen = /* @__PURE__ */ new Set()) {
+  if (!isObject(val))
+    return val;
+  if (seen.has(val))
+    return val;
+  seen.add(val);
+  for (let key in val) {
+    traverse(val[key], seen);
+  }
+  return val;
+}
+function watch(source, cb) {
+  let getter;
+  if (isReactive(source)) {
+    getter = () => traverse(source);
+  } else if (isFunction(source)) {
+    getter = source;
+  }
+  let oldVal;
+  const effect2 = new ReactiveEffect(getter, () => {
+    let newVal = effect2.run();
+    cb(newVal, oldVal);
+    oldVal = newVal;
+  });
+  oldVal = effect2.run();
+}
 export {
   ReactiveEffect,
   ReactiveFlags,
   activeEffect,
   effect,
+  isReactive,
   reactive,
   track,
-  trigger
+  trigger,
+  watch
 };
 //# sourceMappingURL=reactivity.js.map

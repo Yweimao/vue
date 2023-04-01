@@ -15,7 +15,9 @@ export function reactive(target) {
   const exitingProxy = reaceiveMap.get(target); //看一下这个对象是否被代理过
 
   // 被代理对象取值， 会触发proxy的get方法
-  if (target[ReactiveFlags.IS_REACTIVE]) return target; // 如果是代理过的对象，直接返回
+  if (target[ReactiveFlags.IS_REACTIVE]) {
+    return target; // 如果是代理过的对象，直接返回
+  }
 
   if (exitingProxy) return exitingProxy; //代理过直接返回
 
@@ -24,4 +26,8 @@ export function reactive(target) {
   reaceiveMap.set(target, proxy); // 缓存代理对象
 
   return proxy;
+}
+
+export function isReactive(val) {
+  return val[ReactiveFlags.IS_REACTIVE];
 }

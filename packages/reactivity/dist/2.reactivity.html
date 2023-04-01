@@ -16,25 +16,26 @@
       import { reactive, effect } from "./reactivity.js";
 
       //1） 创建一个响应式对象
-      // const state1 = reactive({
-      //   name: "ywm",
-      //   age: 18,
-      // });
+      const state1 = reactive({
+        name: "ywm",
+        age: 18,
+      });
+      console.log("state", state1);
       // const state2 = reactive(state1); // 已经被代理过的对象不能再被代理了
       // console.log(state1 == state2);
 
       // //2） 副作用函数，数据变化后会重新执行此函数
-      const state = reactive({
-        name: "ywm",
-        age: 18,
-      });
-      effect(() => {
-        app.innerHTML = state.name + state.age;
-      });
+      // const state = reactive({
+      //   name: "ywm",
+      //   age: 18,
+      // });
+      // effect(() => {
+      //   app.innerHTML = state.name + state.age;
+      // });
 
-      setTimeout(() => {
-        state.name = "ywm2";
-      }, 1000);
+      // setTimeout(() => {
+      //   state.name = "ywm2";
+      // }, 1000);
       // //3) 属性会收集effect (数据依赖收集) 数据会记录自己在那个effect中使用了，数据变化了会找到对应的effect来更新
     </script>
   </body>
