@@ -87,11 +87,15 @@ export function track(target, key) {
       depsMap.set(key, (dep = new Set()));
     }
     // 判断当前属性是否有副作用函数的集合
-    const shouldTrack = !dep.has(activeEffect);
-    if (shouldTrack) {
-      dep.add(activeEffect);
-      activeEffect.deps.push(dep);
-    }
+    trackEffect(dep);
+  }
+}
+
+export function trackEffect(dep) {
+  const shouldTrack = !dep.has(activeEffect);
+  if (shouldTrack) {
+    dep.add(activeEffect);
+    activeEffect.deps.push(dep);
   }
 }
 
@@ -100,9 +104,11 @@ export function trigger(target, key, newValue, oldValue) {
   const depsMap = targetMap.get(target);
   if (!depsMap) return;
   const dep = depsMap.get(key);
+  triggerEffect(dep);
+}
 
+export function triggerEffect(dep) {
   const effects = [...dep];
-
   effects &&
     effects.forEach((effect) => {
       if (effect !== activeEffect) {
