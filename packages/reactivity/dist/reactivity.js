@@ -143,7 +143,13 @@ function traverse(val, seen = /* @__PURE__ */ new Set()) {
   }
   return val;
 }
-function watch(source, cb) {
+function watchEffect(source, options) {
+  dowatch(source, null, options);
+}
+function watch(source, cb, options) {
+  dowatch(source, cb, options);
+}
+function dowatch(source, cb, options) {
   let getter;
   if (isReactive(source)) {
     getter = () => traverse(source);
@@ -151,22 +157,35 @@ function watch(source, cb) {
     getter = source;
   }
   let oldVal;
-  const effect2 = new ReactiveEffect(getter, () => {
-    let newVal = effect2.run();
-    cb(newVal, oldVal);
-    oldVal = newVal;
-  });
+  let clear;
+  function onCleanup(fn) {
+    clear = fn;
+  }
+  function job() {
+    if (cb) {
+      if (clear)
+        clear();
+      let newVal = effect2.run();
+      cb(newVal, oldVal, onCleanup);
+      oldVal = newVal;
+    } else {
+      effect2.run();
+    }
+  }
+  const effect2 = new ReactiveEffect(getter, job);
   oldVal = effect2.run();
 }
 export {
   ReactiveEffect,
   ReactiveFlags,
   activeEffect,
+  dowatch,
   effect,
   isReactive,
   reactive,
   track,
   trigger,
-  watch
+  watch,
+  watchEffect
 };
 //# sourceMappingURL=reactivity.js.map

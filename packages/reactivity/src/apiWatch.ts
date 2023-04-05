@@ -18,22 +18,44 @@ function traverse(val, seen = new Set()) {
   return val;
 }
 
+export function watchEffect(source, options) {
+  dowatch(source, null, options);
+}
+
+export function watch(source, cb, options) {
+  dowatch(source, cb, options);
+}
+
 // 响应式对象变化，用户执行回调函数的逻辑
-export function watch(source, cb) {
+export function dowatch(source, cb, options) {
+  // 1 source 是一个响应式对象 如： state
+  // 2 source 是一个函数 如： （） => state.name
   let getter;
+  // effect + scheduler
   if (isReactive(source)) {
     getter = () => traverse(source);
   } else if (isFunction(source)) {
     getter = source;
   }
   let oldVal;
+  let clear;
+  function onCleanup(fn) {
+    clear = fn;
+  }
+
+  function job() {
+    if (cb) {
+      if (clear) clear(); // 下次执行的时候将上次的执行一下
+      // 执行getter函数
+      let newVal = effect.run();
+      cb(newVal, oldVal, onCleanup);
+      oldVal = newVal;
+    } else {
+      effect.run();
+    }
+  }
   // getter函数为（） => state.name 就会触发依赖收集
-  // 如说数据变化就会出发 scheduler方法执行
-  const effect = new ReactiveEffect(getter, () => {
-    // 执行getter函数
-    let newVal = effect.run();
-    cb(newVal, oldVal);
-    oldVal = newVal;
-  });
-  oldVal = effect.run();
+  // 如果数据变化就会触发 scheduler方法执行
+  const effect = new ReactiveEffect(getter, job);
+  oldVal = effect.run(); // 触发依赖收集
 }
