@@ -102,6 +102,7 @@ function toReactive(value) {
 var RefImpl = class {
   constructor(rawValue) {
     this.rawValue = rawValue;
+    this.__v_isRef = true;
     this.dep = /* @__PURE__ */ new Set();
     this._value = toReactive(rawValue);
   }
@@ -119,6 +120,46 @@ var RefImpl = class {
 };
 function ref(value) {
   return new RefImpl(value);
+}
+var objectRefImpl = class {
+  constructor(_object, _key) {
+    this._object = _object;
+    this._key = _key;
+    this.__v_isRef = true;
+  }
+  get value() {
+    return this._object[this._key];
+  }
+  set value(newValue) {
+    this._object[this._key] = newValue;
+  }
+};
+function toRef(object, key) {
+  return new objectRefImpl(object, key);
+}
+function toRefs(object) {
+  const ret = Array.isArray(object) ? new Array(object.length) : /* @__PURE__ */ Object.create(null);
+  for (const key in object) {
+    ret[key] = toRef(object, key);
+  }
+  return ret;
+}
+function proxyRefs(object) {
+  return new Proxy(object, {
+    get(target, key, receiver) {
+      const v = Reflect.get(target, key, receiver);
+      return isRef(v) ? v.value : v;
+    },
+    set(target, key, value, receiver) {
+      const oldValue = Reflect.get(target, key, receiver);
+      if (isRef(oldValue)) {
+        oldValue.value = value;
+        return true;
+      } else {
+        return Reflect.set(target, key, value, receiver);
+      }
+    }
+  });
 }
 
 // packages/reactivity/src/handler.ts
@@ -263,9 +304,12 @@ export {
   effect,
   isReactive,
   isRef,
+  proxyRefs,
   reactive,
   ref,
   toReactive,
+  toRef,
+  toRefs,
   track,
   trackEffect,
   trigger,

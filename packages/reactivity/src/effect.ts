@@ -11,7 +11,7 @@ function cleanupEffect(effect) {
 export class ReactiveEffect {
   // 默认会将fn挂载到类的实例上面
   // 等价于 private fn; this.fn = fn;
-  constructor(private fn, public scheduler) {}
+  constructor(private fn, public scheduler?) {}
   parent = undefined;
   deps = [];
   active = true;

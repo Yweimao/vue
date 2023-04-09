@@ -28,6 +28,7 @@ export const mutableHandlers = {
   // 代理对象的set方法，拦截代理对象的设置操作。
   set(target, key, value, receiver) {
     const oldValue = target[key];
+    //代理对象设置新值
     const r = Reflect.set(target, key, value, receiver);
     // 更新数据
     // 找到这个属性对应的effect，并让他执行
