@@ -1,6 +1,6 @@
 const { build } = require("esbuild");
 const { resolve } = require("path");
-const target = "reactivity";
+const target = "runtime-dom";
 
 build({
   entryPoints: [resolve(__dirname, `../packages/${target}/src/index.ts`)],

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import {
+        h,
+        reactive,
+        effect,
+        watch,
+        watchEffect,
+        computed,
+        ref,
+        toRef,
+        toRefs,
+        proxyRefs,
+        createRenderer,
+      } from "../../../node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js";
+      // vue的组成部分 vue是区分编译时和运行时的（所谓的不要编译时就是没有把模板变成函数的过程）
+      // 运行时又分为两个部分（核心运行时 不依赖任何平台的    依赖某个平台 提供一些平台对应的api方法的）
+      // vue -> （createApp） runtime-dom(浏览器的运行环境 dom api) -> runtime-core(核心运行时 虚拟dom) -> reactivity(响应式)
+
+      // createApp -> createRender
+      const renderer = createRenderer({
+        createElement(element) {
+          return document.createElement(element);
+        },
+        setElementText(element, text) {
+          element.innerHTML = text;
+        },
+        insert(element, container, anchor = null) {
+          container.insertBefore(element, anchor);
+        },
+      }); //创建一个渲染器， 没有提供如何将虚拟节点转成真是节点
+
+      console.log(h("h1", "hello world"));
+
+      // h方法可以让用户有不同的行为
+      renderer.render(h("h1", "hello world"), document.getElementById("app"));
+
+      // 所谓的渲染器 就是提供渲染api 可以按照你提供的api来进行渲染
+    </script>
+  </body>
+</html>
