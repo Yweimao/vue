@@ -30,13 +30,12 @@
       // 方案1 自己渲染，一般是自己想写一套针对某个平台渲染的逻辑
       // createRenderer({}).render({ type: "h1" }, app);
       // 方案2： 直接用vue的渲染器进行渲染
-      // render({ type: "h1" }, app);
+      render({ type: "h1" }, app);
 
       // createVNode 是底层方法， 要求参数固定
       // h方法是对createVNode的上层封装，主要是为了让用户使用的时候更方便而已
       // render(createVNode("div", { color: "red" }, "hello"), app);
-
-      console.log(createVNode("div", { color: "red" }, "hello"));
+      // console.log(createVNode("div", { color: "red" }, "hello"));
     </script>
   </body>
 </html>

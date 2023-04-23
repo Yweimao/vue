@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      // import {
+      //   reactive,
+      //   effect,
+      //   watch,
+      //   watchEffect,
+      //   computed,
+      //   ref,
+      //   toRef,
+      //   toRefs,
+      //   proxyRefs,
+      //   createRenderer,
+      //   createVNode,
+      //   render,
+      //   h,
+      // } from "../../../node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js";
+      import { createRenderer, render, h } from "./runtime-dom.js";
+
+      // h函数两个参数的情况
+      // 第二个参数是props
+      // render(h("div", { style: { color: "red" } }), app);
+      // 第二个参数是children
+      // render(h("div", "hello"), app);
+      // 第二个参数是虚拟节点
+      // render(h("div", h("span", null, "hello")), app);
+
+      // h函数三个参数的情况  == createVNode函数
+      // 第二个参数是props
+      //  render(h("div", { style: { color: "red" } }, "hello"), app);
+
+      // 3个参数以上的，第二个参数必须是属性
+      //  render(h("div", { style: { color: "red" } }, "hello", "world"), app);
+
+      // 第三个参数是虚拟节点
+      // render(
+      //   h("div", { style: { color: "red" } }, h("span", null, "hello")),
+      //   app
+      // );
+
+      render(h("div", null, h("span", null, "hello")), app);
+    </script>
+  </body>
+</html>

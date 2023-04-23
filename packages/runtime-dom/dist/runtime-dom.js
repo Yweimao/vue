@@ -160,6 +160,29 @@ function createVNode(type, props, children = null) {
   return vnode;
 }
 
+// packages/runtime-core/src/h.ts
+function h(type, propsOrchildren, children) {
+  const l = arguments.length;
+  if (l == 2) {
+    if (isObject(propsOrchildren) && !Array.isArray(propsOrchildren)) {
+      if (isVNode(propsOrchildren)) {
+        return createVNode(type, null, [propsOrchildren]);
+      }
+      return createVNode(type, propsOrchildren);
+    } else {
+      return createVNode(type, null, propsOrchildren);
+    }
+  } else {
+    if (l > 3) {
+      children = Array.from(arguments).slice(2);
+    }
+    if (l == 3 && isVNode(children)) {
+      children = [children];
+    }
+    return createVNode(type, propsOrchildren, children);
+  }
+}
+
 // packages/reactivity/src/effect.ts
 var activeEffect = void 0;
 function cleanupEffect(effect2) {
@@ -468,6 +491,7 @@ export {
   createVNode,
   dowatch,
   effect,
+  h,
   isReactive,
   isRef,
   isVNode,

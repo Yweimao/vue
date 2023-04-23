@@ -13,6 +13,7 @@ export function createRenderer(renderOptions) {
     patchProp: hostPatchProp,
   } = renderOptions; //这些方法和平台无关
 
+  // 将虚拟节点渲染成真实的节点
   const render = (vnode, container) => {
     // 虚拟节点创建 最终生成真实dom 渲染到容器中
     console.log(renderOptions, vnode, container);
